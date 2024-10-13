@@ -35,7 +35,10 @@ SnesBoot:
     BNE -
 
     SEP #$30
-    JSL UploadItemPalettes
+if not(defined("STANDALONE"))
+    jsl UploadItemPalettes
+endif
+
     JSL nes_overlay_init
     JSL (!BASE_BANK<<16)+$C01A ; Startup
 

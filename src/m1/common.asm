@@ -31,19 +31,19 @@ NMIStart:
     phk : plb
     sep #$30
     lda $4210
-    jsl UpdateScrollHDMA
+    jsl m1_UpdateScrollHDMA
     jsl nes_overlay_handle
     jmp $C0DF
 
 ; Replace the NES NMI end with a SNES-specific one and allow hooking of NMI after any standard code
 NMIEnd:
-    jsl SnesUpdateAudio
+    jsl m1_SnesUpdateAudio
     plp : plb : ply : plx : pla
     jmp $C113
 
 ; PPU Update routines    
 WritePPUCTRL:
-    sta PPUCNT0ZP
+    sta m1_PPUCNT0ZP
     pha
     and #$80
     sta $4200
@@ -51,7 +51,7 @@ WritePPUCTRL:
     rts
 
 WritePPUCTRL1:
-    sta PPUCNT1ZP
+    sta m1_PPUCNT1ZP
     pha
     and #$18
     beq .blank
@@ -87,7 +87,9 @@ ChooseRoutineExtended:
     jmp ($000c)
 
 CustomItemHandler_common:
+if not(defined("STANDALONE"))
     jsl CustomItemHandler
+endif
     lda #$03
     jmp $EDD6
 
@@ -266,23 +268,23 @@ LoadSFXRegisters:
     rts
 
 WriteAPUSq0Ctrl0:
-    sta.w APUBase
+    sta.w m1_APUBase
     rts
 
 WriteAPUSq0Ctrl0_I_Y:
-    sta.w APUBase, y
+    sta.w m1_APUBase, y
     rts
 
 WriteAPUSq0Ctrl0_Y:
-    sty.w APUBase
+    sty.w m1_APUBase
     rts
 
 WriteAPUSq0Ctrl1:
     xba
     lda #$40
-    tsb.w APUBase+$16
+    tsb.w m1_APUBase+$16
     xba
-    sta.w APUBase+$01
+    sta.w m1_APUBase+$01
     rts
 
 WriteAPUSq0Ctrl1_I_Y:
@@ -300,23 +302,23 @@ WriteAPUSq0Ctrl1_I_Y:
     rts
 
 WriteAPUSq0Ctrl2:
-    sta.w APUBase+$02
+    sta.w m1_APUBase+$02
     rts
 
 WriteAPUSq0Ctrl2_I_Y:
-    sta.w APUBase+$02, y
+    sta.w m1_APUBase+$02, y
     rts
 
 WriteAPUSq0Ctrl3:
     phx
-    sta.w APUBase+$03
+    sta.w m1_APUBase+$03
     tax
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-    sta.w APUSq0Length
+    sta.w m1_APUSq0Length
     xba
     lda #$01
-    tsb.w APUBase+$15
-    tsb.w APUExtraControl
+    tsb.w m1_APUBase+$15
+    tsb.w m1_APUExtraControl
     plx
     xba
     rts
@@ -341,123 +343,123 @@ WriteAPUSq0Ctrl3_I_Y:
     rts
 
 WriteAPUSq1Ctrl0:
-    sta.w APUBase+$04
+    sta.w m1_APUBase+$04
     rts
 
 WriteAPUSq1Ctrl0_Y:
-    sty.w APUBase+$04
+    sty.w m1_APUBase+$04
     rts
 
 WriteAPUSq1Ctrl1:
     xba
     lda #$80
-    tsb.w APUBase+$16
+    tsb.w m1_APUBase+$16
     xba
-    sta.w APUBase+$05
+    sta.w m1_APUBase+$05
     rts
 
 WriteAPUSq1Ctrl2:
-    sta.w APUBase+$06
+    sta.w m1_APUBase+$06
     rts
 
 WriteAPUSq1Ctrl3:
     phx
-    sta.w APUBase+$07
+    sta.w m1_APUBase+$07
     tax
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-    sta.w APUSq1Length
+    sta.w m1_APUSq1Length
     xba
     lda #$02
-    tsb.w APUBase+$15
-    tsb.w APUExtraControl
+    tsb.w m1_APUBase+$15
+    tsb.w m1_APUExtraControl
     plx
     xba
     rts
 
 WriteAPUTriCtrl0:
-    sta.w APUBase+$08
+    sta.w m1_APUBase+$08
     rts
 
 WriteAPUTriCtrl1:
-    sta.w APUBase+$09
+    sta.w m1_APUBase+$09
     rts
 
 WriteAPUTriCtrl2:
-    sta.w APUBase+$0A
+    sta.w m1_APUBase+$0A
     rts
 
 WriteAPUTriCtrl3:
     phx
-    sta.w APUBase+$0B
+    sta.w m1_APUBase+$0B
     tax
     lda #$04
-    tsb.w APUExtraControl
-    tsb.w APUBase+$15
+    tsb.w m1_APUExtraControl
+    tsb.w m1_APUBase+$15
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-    sta.w APUTriLength
+    sta.w m1_APUTriLength
     txa
     plx
     rts
 
 WriteAPUNoiseCtrl0:
-    sta.w APUBase+$0C
+    sta.w m1_APUBase+$0C
     rts
 
 WriteAPUNoiseCtrl1:
-    sta.w APUBase+$0D
+    sta.w m1_APUBase+$0D
     rts
 
 WriteAPUNoiseCtrl2:
-    sta.w APUBase+$0E
+    sta.w m1_APUBase+$0E
     rts
 
 WriteAPUNoiseCtrl3:
     phx
-    sta.w APUBase+$0F
+    sta.w m1_APUBase+$0F
     tax
     lda #$08
-    tsb.w APUExtraControl
-    tsb.w APUBase+$15
+    tsb.w m1_APUExtraControl
+    tsb.w m1_APUBase+$15
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-    sta.w APUNoiLength
+    sta.w m1_APUNoiLength
     txa
     plx
     rts
 
 WriteAPUControl:
-    sta.w APUIOTemp
+    sta.w m1_APUIOTemp
     xba
-    lda.w APUIOTemp
+    lda.w m1_APUIOTemp
     eor.b #$ff
     and.b #$1f
-    trb.w APUBase+$15
-    trb.w APUExtraControl
-    lsr.w APUIOTemp
+    trb.w m1_APUBase+$15
+    trb.w m1_APUExtraControl
+    lsr.w m1_APUIOTemp
     bcs +
-        stz.w APUBase+$03
-        stz.w APUSq0Length
+        stz.w m1_APUBase+$03
+        stz.w m1_APUSq0Length
 +
-    lsr.w APUIOTemp
+    lsr.w m1_APUIOTemp
     bcs +
-        stz.w APUBase+$07
-        stz.w APUSq1Length
+        stz.w m1_APUBase+$07
+        stz.w m1_APUSq1Length
 +
-    lsr.w APUIOTemp
+    lsr.w m1_APUIOTemp
     bcs +
-        stz.w APUBase+$0B
-        stz.w APUTriLength
+        stz.w m1_APUBase+$0B
+        stz.w m1_APUTriLength
 +
-    lsr.w APUIOTemp
+    lsr.w m1_APUIOTemp
     bcs +
-        stz.w APUBase+$0F
-        stz.w APUNoiLength
+        stz.w m1_APUBase+$0F
+        stz.w m1_APUNoiLength
 +
-    lsr.w APUIOTemp
+    lsr.w m1_APUIOTemp
     bcc +
         lda.b #$10
-        tsb.w APUBase+$15
+        tsb.w m1_APUBase+$15
         bne +
-            tsb.w APUExtraControl
+            tsb.w m1_APUExtraControl
 +
     xba
     rts
