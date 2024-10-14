@@ -324,8 +324,13 @@ start:
         mov $F2,#$47
         mov $F3,#$1F
 
+        ;  Init triangle voice
         mov $F2,#$24            ; sample # for triangle
         mov $F3,#triangle_sample_num
+        mov $F2,#$20
+        mov $F3,#$7F    ; max vol L
+        mov $F2,#$21
+        mov $F3,#$7F    ; max vol R
 
         mov $F2,#$34
         mov $F3,#$00            ; sample # for noise
@@ -801,60 +806,21 @@ triangle:
         bne tri_enabled
 
 silence3:
-        mov $F2,#$20
-        mov $F3,#0
-        mov $F2,#$21
-        mov $F3,#0
+        mov x,#%00000100
+        call stopVoiceInX
         jmp noise
 
 tri_enabled:
-
-;        mov a,no4016
-;        and a,#%00000100
-;        beq silence3
-
         mov a,tr4008
         beq silence3
-        and a,#%10000000
+        and a,#%10000000        ;  Get Halt length counter / linear counter control flag
         beq tri_length_enabled
-        mov a,tr4008
-        and a,#%01111111
+        mov a,tr4008            
+        and a,#%01111111        ;  Get linear counter load (R)
         beq silence3
 
-        mov a,no4016
-        and a,#$20
-        beq mono3
-
-        ;  Why is triangle channel referencing pcm_raw??
-        ;  A likely bug.  removing block below
-        ; ----------------------------------------------
-        ; mov a,pcm_raw   
-        ; lsr a
-        ; mov temp_add,a
-        mov a,#$7F
-
-        ; setc
-        ; sbc a,temp_add
-        ; ----------------------------------------------
-
-        mov $F2,#$20
-        mov $F3,a
-        mov $F2,#$21
-        mov $F3,a
-
- 
-;        mov $F2,#$20    ; set volume
-;        mov $F3,#$3F
-;        mov $F2,#$21
-;        mov $F3,#$3F
-	  
-	  bra notimer
-mono3:
-
-        mov $F2,#$20
-        mov $F3,#$7F
-        mov $F2,#$21
-        mov $F3,#$7F
+        mov x,#%00000100
+        call playVoiceInX
 
         bra notimer
 
@@ -864,22 +830,23 @@ tri_length_enabled:
         and a,#%00000100
         beq notimer
         mov a,tr4008
-        and a,#%01111111
+        and a,#%01111111        ;  Get linear counter load (R)
         mov y,#3
         mul ya
         mov linear_count_hi,y
         mov linear_count_lo,a
 
         mov a,$FF                ; clear counter
-notimer:	  
 
+        mov x,#%00000100
+        call playVoiceInX
+
+notimer:	  
         call check_timer3
 
+        and tr400B,#%00000111   ;  Get triangle timer high bits
 
-
-        and $4B,#%00000111
-
-        mov a,$4A
+        mov a,tr400A    ;  Triangle timer low bits
         clrc
         rol a
         push p
@@ -888,7 +855,7 @@ notimer:
         rol temp3
         mov temp1,a
         pop p
-        mov a,$4B
+        mov a,tr400B
         rol a
         ror temp3
         adc a,#(tritable/256)&255
@@ -916,11 +883,9 @@ notimer:
                 mov tri_sample,a
                 mov $F2,#$24			; Sample # reg
                 mov $F3,a
-                ; mov $F2,#$4C			; Key on
-                ; mov $F3,#$04
+
 triangle_skip1:
 
-;=====================================
 
 ;-------------------------------------
 noise:
@@ -1053,10 +1018,13 @@ dmc:
 
 dmc_silence:
         mov $F2,#$4c
+        mov a,$F3
+        and a,#%00010000        ;  Check dmc KON
+        beq .noAction
         mov $F3,#%00000000  ;  disable KON
         mov $F2,#$5c
         mov $F3,#%00010000  ;  KOFF dpcm channel
-
+.noAction:
         jmp next_xfer
 
 dmc_play:
@@ -1121,6 +1089,44 @@ dmc_continue_playing:
         jmp next_xfer
 ;  END processing loop
 
+
+;==========~ Subroutines ~========
+;  Subroutines to support the main
+;  processing loop begin below.
+;=================================
+
+
+;  Initiates playback of the voice indicated
+;  by the flag value in [X], but only if the
+;  voice is not already playing.  Does not affect
+;  other voices.
+playVoiceInX:
+        mov $F2,#$4c    ; KON
+        mov a,x
+        and a,$F3       ;  Check if selected voice has KON
+        bne .alreadyPlaying
+        mov $F3,x      ;  KON selected voice only
+        mov $F2,#$5c    ; KOFF
+        mov a,x
+        eor a,#$ff     ;  invert [A]
+        and a,$F3       ;  xor with current KOFF'ed voices
+        mov $F3,a      ;  disable KOFF for selected voice only
+.alreadyPlaying:
+ret
+
+;  Stops playback for the voice indicated
+;  by the flag value in [X].  Does not affect
+;  other voices.
+stopVoiceInX:
+        mov $F2,#$4c    ; KON
+        mov a,x
+        and a,$F3       ;  Check if selected voice has KON
+        beq .offOnly
+        mov $F3,#$00       ;  update KON
+.offOnly:
+        mov $F2,#$5c    ; KOFF
+        mov $F3,x      ;  Update selected voice only
+ret
 
 ;======================================
 ; timer notes:
@@ -1508,21 +1514,13 @@ needed:
         bcs timer3_complete
 timer3_ongoing:        
 
-        mov $F2,#$20    ; set volume
-        mov $F3,#$7F
-        mov $F2,#$21
-        mov $F3,#$7F
-
 not_needed:
         ret
 
 timer3_complete:
-;        mov $F1,#0
+        mov x,#%00000100
+        call stopVoiceInX
 
-        mov $F2,#$20
-        mov $F3,#0
-        mov $F2,#$21
-        mov $F3,#0
         mov linear_count_lo,#0
         mov linear_count_hi,#0
 
