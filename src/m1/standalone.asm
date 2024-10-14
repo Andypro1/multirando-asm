@@ -92,6 +92,7 @@ incsrc "snes.asm"
 
 org $A88000
 incsrc "../nes-spc/spc.asm"
+warnpc $003fff  ;  Note: pc is reset to spc by spc.asm
 ;  we're now at ~$a8bc88.  Start next chunk at $a8c000
 
 ; Include common code (will be copied to WRAM $1000-$1FFF when switching to M1)
