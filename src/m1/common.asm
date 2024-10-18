@@ -309,16 +309,17 @@ WriteAPUSq0Ctrl2_I_Y:
     sta.w m1_APUBase+$02, y
     rts
 
+;  Writes to $4003
 WriteAPUSq0Ctrl3:
     phx
     sta.w m1_APUBase+$03
     tax
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-    sta.w m1_APUSq0Length
+    sta.w m1_APUSq0Length       ;  Used by snes.asm/SoundEmulateLengthCounters
     xba
     lda #$01
-    tsb.w m1_APUBase+$15
-    tsb.w m1_APUExtraControl
+    tsb.w m1_APUBase+$15        ;  Set sq0 channel in spc var sound_ctrl
+    tsb.w m1_APUExtraControl    ;  Set sq0 channel in spc var no4016
     plx
     xba
     rts
@@ -405,6 +406,7 @@ WriteAPUNoiseCtrl0:
     sta.w m1_APUBase+$0C
     rts
 
+;  Never called; $400d is unused by the APU
 WriteAPUNoiseCtrl1:
     sta.w m1_APUBase+$0D
     rts
@@ -480,7 +482,8 @@ db $01
 dw $0000
 db $00
 
-
+;  This is a scaled version of the table at https://www.nesdev.org/wiki/APU_Length_Counter
+;  Why isn't the scaling done on the spc instead?  And why are there 8 bytes per entry?
 Sound__EmulateLengthCounter_length_d3_mixed:
 fillbyte $06 : fill 8
 fillbyte $80 : fill 8
