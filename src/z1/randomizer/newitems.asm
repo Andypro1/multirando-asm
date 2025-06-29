@@ -140,7 +140,7 @@ print "Anim_WriteSpecificItemSprites_extended = ", pc
 Anim_WriteSpecificItemSprites_extended:
     ; cpy.b #$01  ;cpy.b #$30     ;  Rom ~006482e0 Force native items to be also rendered by the code in .extended
     cpy.b #$30
-    bne .extended
+    bcs .extended
     stx $08                     
     lda #$01                    
     sta $07
