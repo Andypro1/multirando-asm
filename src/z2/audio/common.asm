@@ -10,6 +10,10 @@ Sq0:
     stx.w z2_Sq0Duty_4000
     rts
 
+..WriteY:
+    sty.w z2_Sq0Duty_4000
+    rts
+
 ;  Methods and properties for pitch sweep
 .Sweep
 
@@ -30,8 +34,12 @@ Sq0:
     sta z2_Sq0Timer_4002
 ...next:
     cpx #$04
-    bne ...done
+    bne ...next2
     sta z2_Sq1Timer_4006
+...next2:
+    cpx #$08
+    bne ...done
+    sta z2_TrgTimer_400A
 ...done:
     rts
 
@@ -53,7 +61,7 @@ Sq0:
     bra ...done
 ...next:
     cpx #$04
-    bne ...done
+    bne ...next2
     sta z2_Sq1Length_4007
     tax
     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
@@ -62,10 +70,20 @@ Sq0:
     lda #$02
     tsb.w z2_ApuStatus_4015
     tsb.w z2_APUExtraControl
+    bra ...done
+...next2:
+    cpx #$08
+    bne ...done
+    sta z2_TrgLength_400B
+    tax
+    lda #$04
+    tsb.w z2_APUExtraControl
+    tsb.w z2_ApuStatus_4015
+    lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
+    sta.w z2_APUTriLength ; $924 - not a well-named variable..
 ...done:
     plx : pla
     rts
-
 
 ;  Group of methods for the square wave 1 channel
 Sq1:
@@ -88,10 +106,15 @@ Sq1:
     sty.w z2_Sq1Sweep_4005
     rts
 
+;  Group of methods for the triangle channel
+Tri:
 
+;  Methods and properties for linear
+.Linear
 
-
-
+..WriteY:
+    sty.w z2_TrgLinear_4008
+    rts
 
 
 

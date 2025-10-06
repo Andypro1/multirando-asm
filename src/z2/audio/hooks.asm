@@ -21,6 +21,8 @@ optimize address ram
 ; 19060  9D 03 40       STA Sq0Length_4003,X
 ; 190B1  9D 02 40       STA Sq0Timer_4002,X
 ; 19031  8E 00 40       STX Sq0Duty_4000
+; 1CF83  8C 00 40       STY Sq0Duty_4000
+
 ; 19034  8C 01 40       STY Sq0Sweep_4001
 ; 19038  8E 04 40       STX Sq1Duty_4004
 ; 1903B  8C 05 40       STY Sq1Sweep_4005
@@ -31,6 +33,8 @@ optimize address ram
 
 ; 18007  8D 15 40       STA ApuStatus_4015
 ; 19292  8D 15 40       STA ApuStatus_4015
+; 19298  8D 15 40       STA ApuStatus_4015
+; 1985A  8D 15 40       STA ApuStatus_4015
 
 
 ;  Mesen debug expression build:
@@ -45,14 +49,24 @@ optimize address ram
 ; (pc - $9D63 > 4) &&
 ; (pc - $959D > 4) &&
 ; (pc - $95A0 > 4) &&
-; (pc - $95A3 > 4)
+; (pc - $95A3 > 4) &&
+; (pc - $cf83 > 4)
 
+; (pc - $8007 > 4) &&
+; (pc - $9292 > 4) &&
+; (pc - $9298 > 4) &&
+; (pc - $985a > 4)
 
 ; Patch APU status calls
 ; 18007  8D 15 40       STA ApuStatus_4015
+; 19292  8D 15 40       STA ApuStatus_4015
+; 19298  8D 15 40       STA ApuStatus_4015
+; 1985A  8D 15 40       STA ApuStatus_4015
 
 org !B6+$8007 : jsr z2_WriteAPUControl
 org !B6+$9292 : jsr z2_WriteAPUControl
+org !B6+$9298 : jsr z2_WriteAPUControl
+org !B6+$985a : jsr z2_WriteAPUControl
 
 ; org !B0+$982B : jsr WriteAPUControl
 ; ; org !B0+$9830 : sta $0915
@@ -69,11 +83,13 @@ org !B6+$9292 : jsr z2_WriteAPUControl
 ; 190B1  9D 02 40       STA Sq0Timer_4002,X
 ; 19031  8E 00 40       STX Sq0Duty_4000
 ; 19034  8C 01 40       STY Sq0Sweep_4001
+; 1CF83  8C 00 40       STY Sq0Duty_4000
 
 org !B6+$904a : jsr Sq0_Timer_WriteXIndexed;sta.w z2_Sq0Timer_4002,X ;jsr WriteAPUSq0Ctrl0_X 
 org !B6+$9060 : jsr Sq0_Length_WriteXIndexed ;jsr WriteAPUSq0Ctrl0_X z2_WriteAPUSq0Ctrl3
 org !B6+$90b1 : jsr Sq0_Timer_WriteXIndexed ;jsr WriteAPUSq0Ctrl0_X 
 org !B6+$9031 : jsr Sq0_Duty_WriteX;stx.w z2_Sq0Duty_4000 ;jsr WriteAPUSq0Ctrl0_X 
+org !B7+$cf83 : jsr Sq0_Duty_WriteY
 org !B6+$9034 : jsr Sq0_Sweep_WriteY;sty.w z2_Sq0Sweep_4001 ;jsr WriteAPUSq0Ctrl0_X 
 
 
@@ -105,6 +121,17 @@ org !B6+$903b : jsr Sq1_Sweep_WriteY
 
 ; org !B0+$9B19 : jsr WriteAPUSq1Ctrl3_X
 ; org !B0+$9C3B : jsr WriteAPUSq1Ctrl3
+
+
+; Handled by sq0 routines:
+; 1904A  9D 02 40       STA Sq0Timer_4002,X (x==08)
+; 19060  9D 03 40       STA Sq0Length_4003,X (x==08)
+
+; 19D63  8C 08 40       STY TrgLinear_4008
+
+org !B6+$9d63 : jsr Tri_Linear_WriteY
+
+; CHECK: $9067 in B6 in zelda2.nes
 
 ; ; Hook writes to Triangle Channel
 ; org !B0+$9E5D : jsr WriteAPUTriCtrl0
