@@ -116,229 +116,56 @@ Tri:
     sty.w z2_TrgLinear_4008
     rts
 
+;  Group of methods for the noise channel
+Noise:
 
+;  Methods and properties for volume
+.Volume
 
-; z2_WriteAPUSq0Ctrl0:
-;     sta.w z2_APUBase
-;     rts
+..WriteA:
+    sta z2_NoiseVolume_400C
+    rts
 
+;  Methods and properties for noise frequency
+.Period
 
+..WriteA:
+    sta z2_NoisePeriod_400E
+    rts
 
+..WriteX:
+    stx.w z2_NoisePeriod_400E
+    rts
 
+;  Methods and properties for note length
+.Length
 
+..WriteA:
+    phx
+    sta z2_NoiseLength_400F
+    tax
+    lda #$08
+    tsb.w z2_APUExtraControl
+    tsb.w z2_ApuStatus_4015
+    lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
+    sta.w z2_APUNoiLength ; $0926 - not a well-named variable..
+    txa
+    plx
+    rts
 
-; z2_WriteAPUSq0Ctrl0_I_Y:
-;     sta.w z2_APUBase, y
-;     rts
+..WriteY:
+    phx
+    sty.w z2_NoiseLength_400F
+    tax
+    lda #$08
+    tsb.w z2_APUExtraControl
+    tsb.w z2_ApuStatus_4015
+    lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
+    sta.w z2_APUNoiLength ; $0926 - not a well-named variable..
+    txa
+    plx
+    rts
 
-; z2_WriteAPUSq0Ctrl0_Y:
-;     sty.w z2_APUBase
-;     rts
-
-; z2_WriteAPUSq0Ctrl0_X:
-;     stx.w z2_APUBase
-;     rts
-
-; z2_WriteAPUSq0Ctrl1:
-;     xba
-;     lda #$40
-;     tsb.w z2_APUBase+$16
-;     xba
-;     sta.w z2_APUBase+$01
-;     rts
-
-; z2_WriteAPUSq0Ctrl1_Y:
-;     xba
-;     lda #$40
-;     tsb.w z2_APUBase+$16
-;     xba
-;     sty.w z2_APUBase+$01
-;     rts
-
-; z2_WriteAPUSq0Ctrl1_I_Y:
-;     cpy #$00
-;     bne +
-;     jsr z2_WriteAPUSq0Ctrl1
-;     rts
-; +
-;     ; cpy #$04
-;     ; bne +
-;     ; jsr z2_WriteAPUSq1Ctrl1
-;     ; rts
-; +
-;     sta $0901, y
-;     rts
-
-; z2_WriteAPUSq0Ctrl3:
-;     phx
-;     sta.w z2_APUBase+$03
-;     tax
-;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-;     sta.w z2_APUSq0Length
-;     xba
-;     lda #$01
-;     tsb.w z2_APUBase+$15
-;     tsb.w z2_APUExtraControl
-;     plx
-;     xba
-;     rts
-
-; z2_WriteAPUSq0Ctrl3_X:
-;     pha
-;     stx.w z2_APUBase+$03
-;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-;     sta.w z2_APUSq0Length
-;     lda #$01
-;     tsb.w z2_APUBase+$15
-;     tsb.w z2_APUExtraControl
-;     pla
-;     rts
-
-; z2_WriteAPUSq0Ctrl3_I_Y:
-;     cpy #$00
-;     bne +
-;     jsr z2_WriteAPUSq0Ctrl3
-;     rts
-; +
-;     ; cpy #$04
-;     ; bne +
-;     ; jsr z2_WriteAPUSq1Ctrl3
-;     ; rts
-; +
-;     ; cpy #$08
-;     ; bne +
-;     ; jsr z2_WriteAPUTriCtrl3
-;     ; rts
-; +
-;     ; jsr z2_WriteAPUNoiseCtrl3
-;     rts
-
-; ; WriteAPUSq1Ctrl0:
-; ;     sta.w APUBase+$04
-; ;     rts
-
-; ; WriteAPUSq1Ctrl0_X:
-; ;     stx.w APUBase+$04
-; ;     rts
-
-; ; WriteAPUSq1Ctrl0_Y:
-; ;     sty.w APUBase+$04
-; ;     rts
-
-; ; WriteAPUSq1Ctrl1:
-; ;     xba
-; ;     lda #$80
-; ;     tsb.w APUBase+$16
-; ;     xba
-; ;     sta.w APUBase+$05
-; ;     rts
-
-; ; WriteAPUSq1Ctrl1_X:
-; ;     xba
-; ;     lda #$80
-; ;     tsb.w APUBase+$16
-; ;     xba
-; ;     stx.w APUBase+$05
-; ;     rts
-
-; ; WriteAPUSq1Ctrl1_Y:
-; ;     xba
-; ;     lda #$80
-; ;     tsb.w APUBase+$16
-; ;     xba
-; ;     sty.w APUBase+$05
-; ;     rts
-
-; ; WriteAPUSq1Ctrl2:
-; ;     sta.w APUBase+$06
-; ;     rts
-
-; ; WriteAPUSq1Ctrl2_X:
-; ;     stx.w APUBase+$06
-; ;     rts
-
-; ; WriteAPUSq1Ctrl3:
-; ;     phx
-; ;     sta.w APUBase+$07
-; ;     tax
-; ;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-; ;     sta.w APUSq1Length
-; ;     xba
-; ;     lda #$02
-; ;     tsb.w APUBase+$15
-; ;     tsb.w APUExtraControl
-; ;     plx
-; ;     xba
-; ;     rts
-
-; ; WriteAPUSq1Ctrl3_X:
-; ;     pha
-; ;     stx.w APUBase+$07
-; ;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-; ;     sta.w APUSq1Length
-; ;     lda #$02
-; ;     tsb.w APUBase+$15
-; ;     tsb.w APUExtraControl
-; ;     pla
-; ;     rts
-
-; ; WriteAPUTriCtrl0:
-; ;     sta.w APUBase+$08
-; ;     rts
-
-; ; WriteAPUTriCtrl1:
-; ;     sta.w APUBase+$09
-; ;     rts
-
-; ; WriteAPUTriCtrl2:
-; ;     sta.w APUBase+$0A
-; ;     rts
-
-; ; WriteAPUTriCtrl2_X:
-; ;     stx.w APUBase+$0A
-; ;     rts
-
-; ; WriteAPUTriCtrl3:
-; ;     phx
-; ;     sta.w APUBase+$0B
-; ;     tax
-; ;     lda #$04
-; ;     tsb.w APUExtraControl
-; ;     tsb.w APUBase+$15
-; ;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-; ;     sta.w APUTriLength
-; ;     txa
-; ;     plx
-; ;     rts
-
-; ; WriteAPUNoiseCtrl0:
-; ;     sta.w APUBase+$0C
-; ;     rts
-
-; ; WriteAPUNoiseCtrl1:
-; ;     sta.w APUBase+$0D
-; ;     rts
-
-; ; WriteAPUNoiseCtrl2:
-; ;     sta.w APUBase+$0E
-; ;     rts
-
-; ; WriteAPUNoiseCtrl2_X:
-; ;     stx.w APUBase+$0E
-; ;     rts
-
-; ; WriteAPUNoiseCtrl3:
-; ;     phx
-; ;     sta.w APUBase+$0F
-; ;     tax
-; ;     lda #$08
-; ;     tsb.w APUExtraControl
-; ;     tsb.w APUBase+$15
-; ;     lda.w Sound__EmulateLengthCounter_length_d3_mixed, x
-; ;     sta.w APUNoiLength
-; ;     txa
-; ;     plx
-; ;     rts
 
 z2_WriteAPUControl:
     sta.w z2_APUIOTemp
