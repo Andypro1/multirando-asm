@@ -13,16 +13,42 @@ org !B6+$985a : jsr z2_WriteAPUControl
 
 ;  Square wave 0 calls
 org !B6+$9031 : jsr Sq0_Duty_WriteX
+;  Possible other calls:
+; 1810f
+; 182a6
+; 192b1
 org !B6+$9034 : jsr Sq0_Sweep_WriteY
+;  Possible other calls:
+; 18112
 org !B6+$904a : jsr Sq0_Timer_WriteXIndexed
+;  Possible other calls:
+; 18128
+; 18188
+
 org !B6+$9060 : jsr Sq0_Length_WriteXIndexed
+;  Possible other calls:
+; 18140
+
 org !B6+$90b1 : jsr Sq0_Timer_WriteXIndexed
 org !B7+$cf83 : jsr Sq0_Duty_WriteY
 
 
+; instructions to search for:
+; sta $40[$00 -> $15] : 8d [00] 40  ; vary [] param up to $15
+; sta $40[$00 -> $15],x : 9d [00] 40
+; stx $40[$00 -> $15] : 8e [00] 40
+; sty $40[$00 -> $15] : 8c [00] 40
+
 ;  Square wave 1 calls
 org !B6+$9038 : jsr Sq1_Duty_WriteX
+;  Possible other calls:
+; 18116
+; 182a9
 org !B6+$903b : jsr Sq1_Sweep_WriteY
+;  Possible other calls:
+; 18119
+
+
 
 ;  Sq1 but handled by sq0 routines:
 ; 190B1  9D 02 40       STA Sq0Timer_4002,X
@@ -41,9 +67,25 @@ org !B6+$9d63 : jsr Tri_Linear_WriteY
 org !B6+$959d : jsr Noise_Length_WriteY
 org !B6+$95a0 : jsr Noise_Period_WriteX
 org !B6+$95a3 : jsr Noise_Volume_WriteA
+;  Possible other calls:
+; 184c5
+; 193dc
+; 19593
+; 197d2
+; 1982e
+; 198fc
+; 19b0a
 org !B6+$9625 : jsr Noise_Period_WriteA
+;  Possible other calls:
+; 184cb
+; 19820
+; 19b00
 org !B6+$962f : jsr Noise_Volume_WriteA
 org !B6+$9634 : jsr Noise_Length_WriteA
+;  Possible other calls:
+; 184d1
+; 19826
+; 19b0f
 org !B6+$9b4b : jsr Noise_Volume_WriteA
 
 
