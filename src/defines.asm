@@ -61,6 +61,7 @@ print "SRAM buffer ends at ", hex(!INVENTORY_TEMP_3)
 !SRAM_ALTTP_SPC_BUF = $40AC00 ; to $40ACFF
 
 !SRAM_RANDOLIVE = $40AD00   ; to $40AEFF
+!SRAM_Z1_EXPANDED_DUNGEONS = $40B800 ; to $40BC7F
 
 ;  Z1 sram
 !SRAM_Z1_Start = $406000
@@ -86,6 +87,10 @@ print "SRAM buffer ends at ", hex(!INVENTORY_TEMP_3)
 
 ; IRAM SA-1 vector code (30F0-30FF)
 !IRAM_VECTOR_CODE = $0030f0
+
+; Scratch stack for a game's transition-in routine, kept in IRAM to avoid writing WRAM.
+; Lives in the free IRAM window $3200-$34FF (grows down, ~$300 bytes of headroom).
+!IRAM_TRANSITION_STACK = $0034ff
 
 ; Temporary IRAM variables (3500-35FF)
 !IRAM_TRANSITION_GAME_ID = $003500

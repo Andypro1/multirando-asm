@@ -457,6 +457,7 @@ PpuScroll_2005 = $2005
 PpuAddr_2006 = $2006
 PpuData_2007 = $2007
 
+;  TODO: Move to labels in audio dir
 Sq0Duty_4000 = $900
 Sq0Sweep_4001 = $901
 Sq0Timer_4002 = $902
@@ -479,6 +480,7 @@ SpriteDma_4014 = $914
 ApuStatus_4015 = $915
 Ctrl1_4016 = $4016
 Ctrl2_FrameCtr_4017 = $4017
+ApuFrameCounter = $917
 
 
 SaveRamBegin = $7E6001
@@ -550,14 +552,6 @@ VScrolling = $A08
 !VScrollOffset = $0F
 !VSpriteOffset = $0F
 
-APUBase = $0900
-APUExtraControl = $0916
-APUSq0Length = $0920
-APUSq1Length = $0922
-APUTriLength = $0924
-APUNoiLength = $0926
-APUIOTemp = $0928
-
 struct Z1ATTR $7E0B30
     .TopLeft: skip 1
     .TopRight: skip 1
@@ -614,6 +608,8 @@ PalIdx = $0B0E
 
 NeedsBGPriorityUpdate = $0B22
 
+DungeonCopyLength = $0A10
+
 PPUAddrTmpLo = $0A30
 PPUAddrTmpHi = $0A32
 ScrollYDMA = $0A40
@@ -629,6 +625,8 @@ ButtonsDownSnes = $0A4C
 ; Randomizer Labels
 ExitRoomTemp = $0A50
 ExitRoomTable = $0A52
+
+ExtendedItemTemp = $0A58
 
 ; Dynamic items
 DynamicItemIndexes = $0A60
@@ -657,3 +655,11 @@ QuickSwapIndex = $0A9C
 
 ; Item animations
 ;struct Animations $0aa0  ;  Already defined in common/nes/items.asm; but don't put anything else here
+
+; Expanded dungeons
+ExpandedDungeonState = $1B80
+
+; Pre-converted sprite patterns
+SpritePatternData = $7F1000
+CurrentSpriteSet = $0AB0
+CurrentBossSet = $0AB1
