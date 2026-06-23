@@ -3,6 +3,7 @@
 ;
 
 !frame_tile = $A8BE  ; Tile to use for the frame around the keycards
+!M3_DEBUG_OPEN_GREY_DOORS = 1
 
 ; Hook initial drawing of pause screen to draw keycards status on BG3
 ; and make sure it draws only on the map screen and not equipment screen
@@ -33,6 +34,15 @@ keycard_door_plms:
     dw keycard_greydoor_setup, $BFAB, $BF94
 
 keycard_greydoor_preinstruction_hook:
+if !M3_DEBUG_OPEN_GREY_DOORS
+    cpy #$0020      ; Leave custom keycard doors on the keycard path.
+    bcs .keydoor
+    lda #$BDB2      ; Vanilla unlocked grey-door path, effectively blue for traversal.
+    rts
+.keydoor
+    lda #keycard_greydoor_preinstruction
+    rts
+else
     cpy #$0020      ; If grey door type is > E0, it's a keycard door
     bcs .keydoor
     lda.w $BE4B, y
@@ -40,6 +50,7 @@ keycard_greydoor_preinstruction_hook:
 .keydoor
     lda #keycard_greydoor_preinstruction
     rts
+endif
 
 keycard_greydoor_preinstruction:
     lda $1e17, x        ; Load special argument

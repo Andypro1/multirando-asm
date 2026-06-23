@@ -3,15 +3,18 @@
 
 ; Transition table when entering a dungeon/cave
 transition_table_in:
-;  room_id, owscrl, game,  destination, args
-dw $011F, $0002, $0003, $0C0C, $0000       ; Hylia Fortune teller -> M1 Brinstar Shaft
-dw $0122, $0035, $0000, m3_CrateriaMapDoorData_in, $0000       ; Hylia Fortune teller -> M3 Parlor
-dw $0122, $0011, $0002, $0066, $0003       ; Kakariko Fortune teller -> Z1
+;  room_id, screen, game,  destination, args
+;  room_id = $82:C577[EntranceIndex], screen = $040A cached at $7EC140
+dw $0122, $0035, $0000, m3_CrateriaMapDoorData_in, $0000       ; Lake Hylia entrance -> M3 Parlor
+dw $0122, $0011, $0002, $0066, $0003       ; Fortune Teller (Light) -> Z1
 
 dw $00E5, $0003, $0000, $97c2, $0000       ; Death mountain cave -> Norfair map station
 dw $010E, $0077, $0000, $a894, $0000       ; Dark world ice rod cave -> Maridia missile refill
 dw $0115, $0070, $0000, m3_LNRefillDoorData_in, $0000       ;  Misery mire right side -> LN GT Refill
 
+; dw $00F2, $0018, $0003, $091d, $0042       ; Elder House (West) -> M1 Kraid entrance room
+dw $00F2, $0018, $0003, $0715, $00c2       ; Elder House (West) -> M1 Kraid entrance room
+dw $00F3, $0018, $0003, $111d, $0004       ; Elder House (East) -> M1 Ridley room
 
 dw $0000
 
